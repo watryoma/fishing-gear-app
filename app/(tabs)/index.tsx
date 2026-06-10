@@ -1,98 +1,234 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { useDatabase, Category } from '@/hooks/useDatabase';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
+  const { getCategories, getItemsByCategory, deleteCategory, updateCategoryOrder } = useDatabase();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [counts, setCounts] = useState<{ [key: string]: number }>({});
+  const [isEditing, setIsEditing] = useState(false);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  useFocusEffect(
+    useCallback(() => {
+      loadCategories();
+    }, [])
+  );
+
+  const loadCategories = () => {
+    const cats = getCategories();
+    setCategories(cats);
+    const newCounts: { [key: string]: number } = {};
+    cats.forEach((category) => {
+      const items = getItemsByCategory(category.id);
+      newCounts[category.id] = items.length;
+    });
+    setCounts(newCounts);
+  };
+
+  const handleDeleteCategory = (category: Category) => {
+    const itemCount = counts[category.id] ?? 0;
+    const message = itemCount > 0
+      ? `「${category.name}」を削除しますか？\n登録されている${itemCount}個の釣具も削除されます。`
+      : `「${category.name}」を削除しますか？`;
+
+    Alert.alert('削除確認', message, [
+      { text: 'キャンセル', style: 'cancel' },
+      {
+        text: '削除',
+        style: 'destructive',
+        onPress: () => {
+          deleteCategory(category.id);
+          loadCategories();
+        },
+      },
+    ]);
+  };
+
+  const handleDragEnd = ({ data }: { data: Category[] }) => {
+    setCategories(data);
+    updateCategoryOrder(data);
+  };
+
+  const renderItem = ({ item, drag, isActive }: RenderItemParams<Category>) => {
+    return (
+      <TouchableOpacity
+        style={[styles.categoryCard, isActive && styles.categoryCardActive]}
+        onPress={() => {
+          if (isEditing) {
+            handleDeleteCategory(item);
+          } else {
+            router.push(`/category/${item.id}`);
+          }
+        }}
+        onLongPress={isEditing ? drag : undefined}
+      >
+        {isEditing && <Text style={styles.dragIcon}>☰</Text>}
+        {isEditing && <Text style={styles.deleteIcon}>🗑️</Text>}
+        <View style={[styles.iconContainer, { backgroundColor: item.color }]}>
+          <Text style={styles.icon}>{item.icon}</Text>
+        </View>
+        <View style={styles.textContainer}>
+          <Text style={styles.categoryName}>{item.name}</Text>
+          <Text style={styles.itemCount}>{counts[item.id] ?? 0}個</Text>
+        </View>
+        {!isEditing && <Text style={styles.arrow}>›</Text>}
+      </TouchableOpacity>
+    );
+  };
+
+  return (
+    <View style={styles.wrapper}>
+      {/* ヘッダー */}
+      <View style={styles.header}>
+        <Text style={styles.title}>釣具管理</Text>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.scanButton}
+            onPress={() => router.push('/ai-scan')}
+          >
+            <Text style={styles.scanButtonText}>📷 AI撮影</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setIsEditing(!isEditing)}>
+            <Text style={styles.editButton}>
+              {isEditing ? '完了' : '編集'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <Text style={styles.subtitle}>カテゴリを選択</Text>
+
+      <DraggableFlatList
+        data={categories}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        onDragEnd={handleDragEnd}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      />
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => router.push('/add-category')}
+      >
+        <Text style={styles.addButtonText}>＋ カテゴリ追加</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  wrapper: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    padding: 20,
+    paddingTop: 60,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+  headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  scanButton: {
+    backgroundColor: '#4A90D9',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  scanButtonText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  editButton: {
+    fontSize: 16,
+    color: '#4A90D9',
+    fontWeight: '600',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 16,
+  },
+  categoryCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  categoryCardActive: {
+    opacity: 0.8,
+    shadowOpacity: 0.3,
+    elevation: 8,
+  },
+  dragIcon: {
+    fontSize: 18,
+    color: '#999',
+    marginRight: 8,
+  },
+  deleteIcon: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  iconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  icon: {
+    fontSize: 22,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  categoryName: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  itemCount: {
+    fontSize: 13,
+    color: '#999',
+    marginTop: 2,
+  },
+  arrow: {
+    fontSize: 22,
+    color: '#ccc',
+  },
+  addButton: {
+    backgroundColor: '#4A90D9',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
     position: 'absolute',
+    bottom: 30,
+    left: 20,
+    right: 20,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
