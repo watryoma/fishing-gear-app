@@ -1,50 +1,102 @@
-# Welcome to your Expo app 👋
+# 釣具管理アプリ / Fishing Gear Manager
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+釣具をカテゴリ別に管理できるモバイルアプリです。AIで写真から釣具を自動認識する機能を搭載しています。
 
-## Get started
+React Native (Expo) を使ったポートフォリオ作品です。
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## スクリーンショット
 
-2. Start the app
+<!-- スクリーンショットをGitHubにアップしたら、ここのURLを差し替えてください -->
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 主な機能
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- 📦 カテゴリ別に釣具を管理
+- 🤖 Gemini 2.5 Flash による AI スキャン（写真から商品名を自動取得）
+- 🗂 ドラッグ＆ドロップでカテゴリを並び替え
+- 📝 商品名・個数・金額・日付を登録・編集・削除
+- 🌐 日本語 / 英語 対応（デバイスの言語設定に自動で切り替え）
+- 💾 SQLite によるローカルデータ保存
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 使用技術
 
-When you're ready, run:
+| 技術 | 用途 |
+|---|---|
+| React Native / Expo | モバイルアプリフレームワーク |
+| Expo Router | ファイルベースのナビゲーション |
+| expo-sqlite | ローカルデータベース |
+| Gemini 2.5 Flash API | AI画像解析 |
+| i18n-js / expo-localization | 多言語対応 |
+| react-native-draggable-flatlist | ドラッグ＆ドロップUI |
+
+---
+
+## セットアップ
+
+1. リポジトリをクローン
 
 ```bash
-npm run reset-project
+git clone https://github.com/watryoma/fishing-gear-app.git
+cd fishing-gear-app
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. 依存パッケージをインストール
 
-## Learn more
+```bash
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3. 環境変数を設定
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+   プロジェクトのルートに `.env` ファイルを作成し、Gemini の APIキーを追加してください：
 
-## Join the community
+   EXPO_PUBLIC_GEMINI_API_KEY=your_api_key_here
 
-Join our community of developers creating universal apps.
+4. アプリを起動
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx expo start
+```
+
+---
+
+## 作者
+
+- GitHub: [@watryoma](https://github.com/watryoma)
+
+---
+
+## English
+
+A mobile app to manage your fishing gear with AI-powered item scanning.
+
+Built with React Native (Expo) as a portfolio project.
+
+### Features
+
+- 📦 Manage fishing gear organized by category
+- 🤖 AI scanning powered by Gemini 2.5 Flash — automatically detects item names from photos
+- 🗂 Drag-and-drop category reordering
+- 📝 Add, edit, and delete items with name, quantity, price, and date
+- 🌐 Japanese / English language support (follows device language setting)
+- 💾 Local database storage using SQLite
+
+### Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| React Native / Expo | Mobile app framework |
+| Expo Router | File-based navigation |
+| expo-sqlite | Local database |
+| Gemini 2.5 Flash API | AI image analysis |
+| i18n-js / expo-localization | Internationalization |
+| react-native-draggable-flatlist | Drag-and-drop UI |
+
+### Author
+
+- GitHub: [@watryoma](https://github.com/watryoma)

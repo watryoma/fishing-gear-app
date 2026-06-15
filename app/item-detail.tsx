@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useDatabase, Item } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 export default function ItemDetailScreen() {
   const { itemId } = useLocalSearchParams();
@@ -24,12 +25,12 @@ export default function ItemDetailScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      '削除確認',
-      `「${item?.name}」を削除しますか？`,
+      i18n.t('itemDetail.deleteTitle'),
+      i18n.t('itemDetail.deleteMessage', { name: item?.name }),
       [
-        { text: 'キャンセル', style: 'cancel' },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
         {
-          text: '削除',
+          text: i18n.t('common.delete'),
           style: 'destructive',
           onPress: () => {
             deleteItem(itemId as string);
@@ -43,7 +44,7 @@ export default function ItemDetailScreen() {
   if (!item) {
     return (
       <View style={styles.container}>
-        <Text>読み込み中...</Text>
+        <Text>{i18n.t('common.loading')}</Text>
       </View>
     );
   }
@@ -54,24 +55,28 @@ export default function ItemDetailScreen() {
         <Text style={styles.itemName}>{item.name}</Text>
 
         <View style={styles.row}>
-          <Text style={styles.label}>カテゴリ</Text>
+          <Text style={styles.label}>{i18n.t('itemDetail.category')}</Text>
           <Text style={styles.value}>{categoryName}</Text>
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>個数</Text>
-          <Text style={styles.value}>{item.count}個</Text>
+          <Text style={styles.label}>{i18n.t('itemDetail.count')}</Text>
+          <Text style={styles.value}>
+            {i18n.t('itemDetail.countValue', { count: item.count })}
+          </Text>
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>登録日</Text>
+          <Text style={styles.label}>{i18n.t('itemDetail.date')}</Text>
           <Text style={styles.value}>{item.date}</Text>
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.label}>購入金額</Text>
+          <Text style={styles.label}>{i18n.t('itemDetail.price')}</Text>
           <Text style={styles.value}>
-            {item.price ? `¥${item.price.toLocaleString()}` : '未登録'}
+            {item.price
+              ? i18n.t('itemDetail.priceValue', { price: item.price.toLocaleString() })
+              : i18n.t('itemDetail.noPrice')}
           </Text>
         </View>
       </View>
@@ -80,11 +85,11 @@ export default function ItemDetailScreen() {
         style={styles.editButton}
         onPress={() => router.push(`/edit-item?itemId=${itemId}`)}
       >
-        <Text style={styles.editButtonText}>編集する</Text>
+        <Text style={styles.editButtonText}>{i18n.t('itemDetail.edit')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-        <Text style={styles.deleteButtonText}>削除する</Text>
+        <Text style={styles.deleteButtonText}>{i18n.t('itemDetail.delete')}</Text>
       </TouchableOpacity>
     </View>
   );

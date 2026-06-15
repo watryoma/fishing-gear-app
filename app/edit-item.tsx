@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useDatabase, Item } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 export default function EditItemScreen() {
   const { itemId } = useLocalSearchParams();
@@ -30,7 +31,7 @@ export default function EditItemScreen() {
 
   const handleSave = () => {
     if (name.trim() === '') {
-      Alert.alert('エラー', '商品名を入力してください');
+      Alert.alert(i18n.t('editItem.errorTitle'), i18n.t('editItem.errorMessage'));
       return;
     }
     updateItem(
@@ -46,22 +47,22 @@ export default function EditItemScreen() {
   if (!item) {
     return (
       <View style={styles.container}>
-        <Text>読み込み中...</Text>
+        <Text>{i18n.t('common.loading')}</Text>
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.label}>商品名</Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      <Text style={styles.label}>{i18n.t('editItem.name')}</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="例：メガバス X-80 チャート 80mm"
+        placeholder={i18n.t('editItem.namePlaceholder')}
       />
 
-      <Text style={styles.label}>個数</Text>
+      <Text style={styles.label}>{i18n.t('editItem.count')}</Text>
       <TextInput
         style={styles.input}
         value={count}
@@ -70,25 +71,25 @@ export default function EditItemScreen() {
         placeholder="1"
       />
 
-      <Text style={styles.label}>購入金額（任意）</Text>
+      <Text style={styles.label}>{i18n.t('editItem.price')}</Text>
       <TextInput
         style={styles.input}
         value={price}
         onChangeText={setPrice}
         keyboardType="numeric"
-        placeholder="例：1500"
+        placeholder={i18n.t('editItem.pricePlaceholder')}
       />
 
-      <Text style={styles.label}>登録日</Text>
+      <Text style={styles.label}>{i18n.t('editItem.date')}</Text>
       <TextInput
         style={styles.input}
         value={date}
         onChangeText={setDate}
-        placeholder="YYYY-MM-DD"
+        placeholder={i18n.t('editItem.datePlaceholder')}
       />
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>保存する</Text>
+        <Text style={styles.saveButtonText}>{i18n.t('editItem.save')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useDatabase, Item, Category } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 export default function CategoryScreen() {
   const { id } = useLocalSearchParams();
@@ -23,12 +24,12 @@ export default function CategoryScreen() {
 
   const handleDelete = (item: Item) => {
     Alert.alert(
-      '削除確認',
-      `「${item.name}」を削除しますか？`,
+      i18n.t('category.deleteTitle'),
+      i18n.t('category.deleteMessage', { name: item.name }),
       [
-        { text: 'キャンセル', style: 'cancel' },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
         {
-          text: '削除',
+          text: i18n.t('common.delete'),
           style: 'destructive',
           onPress: () => {
             deleteItem(item.id);
@@ -42,7 +43,7 @@ export default function CategoryScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{category?.name ?? 'カテゴリ'}</Text>
+      <Text style={styles.title}>{category?.name ?? i18n.t('category.defaultTitle')}</Text>
       <FlatList
         data={items}
         keyExtractor={(item) => item.id}
@@ -52,7 +53,7 @@ export default function CategoryScreen() {
             onPress={() => router.push(`/item-detail?itemId=${item.id}`)}
           >
             <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemCount}>{item.count}個</Text>
+            <Text style={styles.itemCount}>{i18n.t('category.itemCount', { count: item.count })}</Text>
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => handleDelete(item)}
@@ -62,14 +63,14 @@ export default function CategoryScreen() {
           </TouchableOpacity>
         )}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>まだ登録されていません</Text>
+          <Text style={styles.emptyText}>{i18n.t('category.empty')}</Text>
         }
       />
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => router.push(`/add-item?categoryId=${id}`)}
       >
-        <Text style={styles.addButtonText}>＋ 釣具を追加</Text>
+        <Text style={styles.addButtonText}>{i18n.t('category.addItem')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -118,11 +119,6 @@ const styles = StyleSheet.create({
   deleteIcon: {
     fontSize: 18,
     opacity: 0.3,
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
   },
   emptyText: {
     textAlign: 'center',

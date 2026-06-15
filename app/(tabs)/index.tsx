@@ -3,6 +3,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useDatabase, Category } from '@/hooks/useDatabase';
 import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
+import i18n from '@/constants/i18n';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -31,13 +32,13 @@ export default function HomeScreen() {
   const handleDeleteCategory = (category: Category) => {
     const itemCount = counts[category.id] ?? 0;
     const message = itemCount > 0
-      ? `「${category.name}」を削除しますか？\n登録されている${itemCount}個の釣具も削除されます。`
-      : `「${category.name}」を削除しますか？`;
+      ? i18n.t('home.deleteCategoryMessageWithItems', { name: category.name, count: itemCount })
+      : i18n.t('home.deleteCategoryMessage', { name: category.name });
 
-    Alert.alert('削除確認', message, [
-      { text: 'キャンセル', style: 'cancel' },
+    Alert.alert(i18n.t('home.deleteCategoryTitle'), message, [
+      { text: i18n.t('common.cancel'), style: 'cancel' },
       {
-        text: '削除',
+        text: i18n.t('common.delete'),
         style: 'destructive',
         onPress: () => {
           deleteCategory(category.id);
@@ -72,7 +73,7 @@ export default function HomeScreen() {
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.categoryName}>{item.name}</Text>
-          <Text style={styles.itemCount}>{counts[item.id] ?? 0}個</Text>
+          <Text style={styles.itemCount}>{i18n.t('home.itemCount', { count: counts[item.id] ?? 0 })}</Text>
         </View>
         {!isEditing && <Text style={styles.arrow}>›</Text>}
       </TouchableOpacity>
@@ -81,25 +82,24 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.wrapper}>
-      {/* ヘッダー */}
       <View style={styles.header}>
-        <Text style={styles.title}>釣具管理</Text>
+        <Text style={styles.title}>{i18n.t('home.title')}</Text>
         <View style={styles.headerButtons}>
           <TouchableOpacity
             style={styles.scanButton}
             onPress={() => router.push('/ai-scan')}
           >
-            <Text style={styles.scanButtonText}>📷 AI撮影</Text>
+            <Text style={styles.scanButtonText}>📷 {i18n.t('home.aiScan')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setIsEditing(!isEditing)}>
             <Text style={styles.editButton}>
-              {isEditing ? '完了' : '編集'}
+              {isEditing ? i18n.t('home.done') : i18n.t('home.edit')}
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <Text style={styles.subtitle}>カテゴリを選択</Text>
+      <Text style={styles.subtitle}>{i18n.t('home.subtitle')}</Text>
 
       <DraggableFlatList
         data={categories}
@@ -113,7 +113,7 @@ export default function HomeScreen() {
         style={styles.addButton}
         onPress={() => router.push('/add-category')}
       >
-        <Text style={styles.addButtonText}>＋ カテゴリ追加</Text>
+        <Text style={styles.addButtonText}>{i18n.t('home.addCategory')}</Text>
       </TouchableOpacity>
     </View>
   );

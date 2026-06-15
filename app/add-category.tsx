@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useDatabase } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 const COLORS = [
   '#4A90D9', '#7BC67E', '#F5A623', '#E87C7C',
@@ -31,18 +32,18 @@ export default function AddCategoryScreen() {
 
   return (
     <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 100 }}
     >
-      <Text style={styles.label}>カテゴリ名</Text>
+      <Text style={styles.label}>{i18n.t('addCategory.name')}</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="例：ジグヘッド"
+        placeholder={i18n.t('addCategory.namePlaceholder')}
       />
 
-      <Text style={styles.label}>アイコン</Text>
+      <Text style={styles.label}>{i18n.t('addCategory.icon')}</Text>
       <View style={styles.grid}>
         {ICONS.map((icon) => (
           <TouchableOpacity
@@ -58,7 +59,7 @@ export default function AddCategoryScreen() {
         ))}
       </View>
 
-      <Text style={styles.label}>カラー</Text>
+      <Text style={styles.label}>{i18n.t('addCategory.color')}</Text>
       <View style={styles.grid}>
         {COLORS.map((color) => (
           <TouchableOpacity
@@ -74,16 +75,16 @@ export default function AddCategoryScreen() {
       </View>
 
       {/* プレビュー */}
-      <Text style={styles.label}>プレビュー</Text>
+      <Text style={styles.label}>{i18n.t('addCategory.preview')}</Text>
       <View style={styles.previewCard}>
         <View style={[styles.previewIcon, { backgroundColor: selectedColor }]}>
           <Text style={styles.previewIconText}>{selectedIcon}</Text>
         </View>
-        <Text style={styles.previewName}>{name || 'カテゴリ名'}</Text>
+        <Text style={styles.previewName}>{name || i18n.t('addCategory.defaultName')}</Text>
       </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>追加する</Text>
+        <Text style={styles.saveButtonText}>{i18n.t('addCategory.save')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

@@ -1,7 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { useDatabase, Category } from '@/hooks/useDatabase';
+import { useDatabase } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 type ScannedItem = {
   name: string;
@@ -20,7 +21,7 @@ export default function AiConfirmScreen() {
 
   const getCategoryName = (category_id: string): string => {
     const cat = categories.find((c) => c.id === category_id);
-    return cat?.name ?? 'その他';
+    return cat?.name ?? i18n.t('category.defaultTitle');
   };
 
   const handleDelete = (index: number) => {
@@ -29,46 +30,48 @@ export default function AiConfirmScreen() {
 
   const handleSaveAll = () => {
     if (items.length === 0) {
-      Alert.alert('エラー', '登録する釣具がありません');
+      Alert.alert(i18n.t('aiConfirm.errorTitle'), i18n.t('aiConfirm.errorMessage'));
       return;
     }
     items.forEach((item) => {
       addItem(item.name, item.count, item.category_id);
     });
-    Alert.alert('完了', `${items.length}件の釣具を登録しました`, [
-      { text: 'OK', onPress: () => router.push('/') },
-    ]);
+    Alert.alert(
+      i18n.t('aiConfirm.successTitle'),
+      i18n.t('aiConfirm.successMessage', { count: items.length }),
+      [{ text: i18n.t('common.ok'), onPress: () => router.push('/') }]
+    );
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.description}>
-        AIが読み取った釣具の一覧です。不要なものは削除してから登録してください。
-      </Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      <Text style={styles.description}>{i18n.t('aiConfirm.description')}</Text>
 
       {items.map((item, index) => (
         <View key={index} style={styles.itemCard}>
           <View style={styles.itemInfo}>
             <Text style={styles.itemName}>{item.name}</Text>
             <Text style={styles.itemCategory}>{getCategoryName(item.category_id)}</Text>
-            <Text style={styles.itemCount}>{item.count}個</Text>
+            <Text style={styles.itemCount}>
+              {i18n.t('aiConfirm.itemCount', { count: item.count })}
+            </Text>
           </View>
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => handleDelete(index)}
           >
-            <Text style={styles.deleteButtonText}>削除</Text>
+            <Text style={styles.deleteButtonText}>{i18n.t('aiConfirm.delete')}</Text>
           </TouchableOpacity>
         </View>
       ))}
 
       {items.length === 0 && (
-        <Text style={styles.emptyText}>登録する釣具がありません</Text>
+        <Text style={styles.emptyText}>{i18n.t('aiConfirm.empty')}</Text>
       )}
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSaveAll}>
         <Text style={styles.saveButtonText}>
-          {items.length}件をまとめて登録する
+          {i18n.t('aiConfirm.saveAll', { count: items.length })}
         </Text>
       </TouchableOpacity>
     </ScrollView>

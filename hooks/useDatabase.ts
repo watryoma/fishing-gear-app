@@ -1,5 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import { useEffect, useState } from 'react';
+import i18n from '@/constants/i18n';
 
 const db = SQLite.openDatabaseSync('fishing-gear.db');
 
@@ -63,17 +64,17 @@ export function useDatabase() {
     // 初期データ
     const existing = db.getAllSync('SELECT id FROM categories');
     if (existing.length === 0) {
-      const defaults = [
-        { id: 'hard-lure', name: 'ハードルアー', icon: '🎣', color: '#4A90D9' },
-        { id: 'soft-bait', name: 'ソフトベイト', icon: '🪱', color: '#7BC67E' },
-        { id: 'metal', name: 'メタル系', icon: '✨', color: '#F5A623' },
-        { id: 'line-hook', name: 'ライン・フック類', icon: '🪝', color: '#E87C7C' },
-        { id: 'rod-reel', name: 'ロッド・リール', icon: '🎿', color: '#9B7FD4' },
-        { id: 'other', name: 'その他', icon: '📦', color: '#8E8E93' },
-        { id: 'shikake', name: '仕掛け', icon: '🎏', color: '#FF9500' },
-        { id: 'omori', name: 'オモリ', icon: '⚓', color: '#636366' },
-        { id: 'uki', name: 'ウキ', icon: '🔴', color: '#FF2D55' },
-      ];
+    const defaults = [
+      { id: 'hard-lure', name: i18n.t('defaultCategories.hardLure'), icon: '🎣', color: '#4A90D9' },
+      { id: 'soft-bait', name: i18n.t('defaultCategories.softBait'), icon: '🪱', color: '#7BC67E' },
+      { id: 'metal', name: i18n.t('defaultCategories.metal'), icon: '✨', color: '#F5A623' },
+      { id: 'line-hook', name: i18n.t('defaultCategories.lineHook'), icon: '🪝', color: '#E87C7C' },
+      { id: 'rod-reel', name: i18n.t('defaultCategories.rodReel'), icon: '🎿', color: '#9B7FD4' },
+      { id: 'other', name: i18n.t('defaultCategories.other'), icon: '📦', color: '#8E8E93' },
+      { id: 'shikake', name: i18n.t('defaultCategories.shikake'), icon: '🎏', color: '#FF9500' },
+      { id: 'omori', name: i18n.t('defaultCategories.omori'), icon: '⚓', color: '#636366' },
+      { id: 'uki', name: i18n.t('defaultCategories.uki'), icon: '🔴', color: '#FF2D55' },
+    ];
       defaults.forEach((cat, index) => {
         db.runSync(
           'INSERT INTO categories (id, name, icon, color, parent_id, sort_order) VALUES (?, ?, ?, ?, NULL, ?)',

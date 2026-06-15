@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { useDatabase } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 const GEMINI_API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
@@ -13,11 +14,11 @@ export default function AiScanScreen() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  //カメラ起動、カメラの起動きょか
+  // カメラ起動、カメラの起動許可
   const handleCamera = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('エラー', 'カメラの許可が必要です');
+      Alert.alert(i18n.t('aiScan.errorTitle'), i18n.t('aiScan.cameraError'));
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -34,7 +35,7 @@ export default function AiScanScreen() {
   const handleGallery = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('エラー', 'ギャラリーへのアクセス許可が必要です');
+      Alert.alert(i18n.t('aiScan.errorTitle'), i18n.t('aiScan.galleryError'));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -48,17 +49,15 @@ export default function AiScanScreen() {
     }
   };
 
-const handleAnalyze = async () => {
-  if (!imageBase64) return;
-  setIsLoading(true);
+  const handleAnalyze = async () => {
+    if (!imageBase64) return;
+    setIsLoading(true);
 
-  try {
-    console.log('APIキー:', GEMINI_API_KEY);
-    
-    const categories = getCategories();
-    const categoryList = categories.map((c) => `${c.id}:${c.name}`).join(', ');
+    try {
+      const categories = getCategories();
+      const categoryList = categories.map((c) => `${c.id}:${c.name}`).join(', ');
 
-    const prompt = `この画像に写っている釣具の商品名を全て読み取ってください。
+      const prompt = `この画像に写っている釣具の商品名を全て読み取ってください。
 各商品について以下のJSON形式で返してください。
 カテゴリは以下から最も適切なものを選んでください：${categoryList}
 
@@ -67,61 +66,56 @@ const handleAnalyze = async () => {
   {"name": "商品名", "category_id": "カテゴリID", "count": 1}
 ]`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              {
-                inline_data: {
-                  mime_type: 'image/jpeg',
-                  data: imageBase64,
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: 'image/jpeg',
+                    data: imageBase64,
+                  },
                 },
-              },
-            ],
-          }],
-        }),
-      }
-    );
+              ],
+            }],
+          }),
+        }
+      );
 
-    const data = await response.json();
-    console.log('APIレスポンス:', JSON.stringify(data));
-    
-    const text = data.candidates[0].content.parts[0].text;
-    const clean = text.replace(/```json|```/g, '').trim();
-    const items = JSON.parse(clean);
+      const data = await response.json();
+      const text = data.candidates[0].content.parts[0].text;
+      const clean = text.replace(/```json|```/g, '').trim();
+      const items = JSON.parse(clean);
 
-    router.push({
-      pathname: '/ai-confirm',
-      params: { items: JSON.stringify(items) },
-    });
-  } catch (error) {
-    console.log('エラー詳細:', error);
-    Alert.alert('エラー', '解析に失敗しました。もう一度試してください。');
-  } finally {
-    setIsLoading(false);
-  }
-};
+      router.push({
+        pathname: '/ai-confirm',
+        params: { items: JSON.stringify(items) },
+      });
+    } catch (error) {
+      Alert.alert(i18n.t('aiScan.errorTitle'), i18n.t('aiScan.analyzeError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.description}>
-        釣具の写真を撮影またはギャラリーから選択すると、AIが商品名を自動で読み取ります。
-      </Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      <Text style={styles.description}>{i18n.t('aiScan.description')}</Text>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.cameraButton} onPress={handleCamera}>
           <Text style={styles.buttonIcon}>📷</Text>
-          <Text style={styles.buttonText}>カメラで撮影</Text>
+          <Text style={styles.buttonText}>{i18n.t('aiScan.camera')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.galleryButton} onPress={handleGallery}>
           <Text style={styles.buttonIcon}>🖼️</Text>
-          <Text style={styles.buttonText}>ギャラリーから選択</Text>
+          <Text style={styles.buttonText}>{i18n.t('aiScan.gallery')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -136,7 +130,7 @@ const handleAnalyze = async () => {
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.analyzeButtonText}>AIで解析する</Text>
+              <Text style={styles.analyzeButtonText}>{i18n.t('aiScan.analyze')}</Text>
             )}
           </TouchableOpacity>
         </View>

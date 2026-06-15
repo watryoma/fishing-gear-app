@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useDatabase } from '@/hooks/useDatabase';
+import i18n from '@/constants/i18n';
 
 export default function AddItemScreen() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function AddItemScreen() {
 
   const handleSave = () => {
     if (name.trim() === '') {
-      Alert.alert('エラー', '商品名を入力してください');
+      Alert.alert(i18n.t('addItem.errorTitle'), i18n.t('addItem.errorMessage'));
       return;
     }
     addItem(
@@ -29,16 +30,16 @@ export default function AddItemScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.label}>商品名</Text>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+      <Text style={styles.label}>{i18n.t('addItem.name')}</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="例：メガバス X-80 チャート 80mm"
+        placeholder={i18n.t('addItem.namePlaceholder')}
       />
 
-      <Text style={styles.label}>個数</Text>
+      <Text style={styles.label}>{i18n.t('addItem.count')}</Text>
       <TextInput
         style={styles.input}
         value={count}
@@ -47,25 +48,25 @@ export default function AddItemScreen() {
         placeholder="1"
       />
 
-      <Text style={styles.label}>購入金額（任意）</Text>
+      <Text style={styles.label}>{i18n.t('addItem.price')}</Text>
       <TextInput
         style={styles.input}
         value={price}
         onChangeText={setPrice}
         keyboardType="numeric"
-        placeholder="例：1500"
+        placeholder={i18n.t('addItem.pricePlaceholder')}
       />
 
-      <Text style={styles.label}>登録日</Text>
+      <Text style={styles.label}>{i18n.t('addItem.date')}</Text>
       <TextInput
         style={styles.input}
         value={date}
         onChangeText={setDate}
-        placeholder="YYYY-MM-DD"
+        placeholder={i18n.t('addItem.datePlaceholder')}
       />
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>保存する</Text>
+        <Text style={styles.saveButtonText}>{i18n.t('addItem.save')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
