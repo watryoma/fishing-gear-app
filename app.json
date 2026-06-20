@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "fishing-gear-app",
+    "name": "TackleBox Manager",
     "slug": "fishing-gear-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.watana.tackleboxmanager",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +32,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-image-picker",
+        {
+          "cameraPermission": "TackleBox Manager uses the camera to take photos of fishing gear. The AI analyzes the photo to automatically detect and register item names.",
+          "microphonePermission": false,
+          "photosPermission": "TackleBox Manager uses your photo library to select photos of fishing gear. The AI analyzes the photo to automatically detect and register item names."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
@@ -45,6 +57,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "670bc68d-f565-40cc-b690-087866bc6329"
+      }
     }
   }
 }
