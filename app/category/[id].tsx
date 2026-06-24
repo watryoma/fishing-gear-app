@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useDatabase, Item, Category } from '@/hooks/useDatabase';
@@ -58,7 +59,7 @@ export default function CategoryScreen() {
               style={styles.deleteButton}
               onPress={() => handleDelete(item)}
             >
-              <Text style={styles.deleteIcon}>🗑️</Text>
+              <Ionicons name="trash-outline" size={20} color="#ccc" />
             </TouchableOpacity>
           </TouchableOpacity>
         )}

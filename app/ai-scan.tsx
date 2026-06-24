@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
@@ -109,12 +110,12 @@ export default function AiScanScreen() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.cameraButton} onPress={handleCamera}>
-          <Text style={styles.buttonIcon}>📷</Text>
+          <Ionicons name="camera-outline" size={32} color="#fff" />
           <Text style={styles.buttonText}>{i18n.t('aiScan.camera')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.galleryButton} onPress={handleGallery}>
-          <Text style={styles.buttonIcon}>🖼️</Text>
+          <Ionicons name="images-outline" size={32} color="#fff" />
           <Text style={styles.buttonText}>{i18n.t('aiScan.gallery')}</Text>
         </TouchableOpacity>
       </View>

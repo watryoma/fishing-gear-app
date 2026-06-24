@@ -106,15 +106,16 @@ export default function HomeScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         onDragEnd={handleDragEnd}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 80 }}
+        ListFooterComponent={
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push('/add-category')}
+          >
+            <Text style={styles.addButtonText}>{i18n.t('home.addCategory')}</Text>
+          </TouchableOpacity>
+        }
       />
-
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => router.push('/add-category')}
-      >
-        <Text style={styles.addButtonText}>{i18n.t('home.addCategory')}</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -221,10 +222,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 30,
-    left: 20,
-    right: 20,
+    marginTop: 8,
   },
   addButtonText: {
     color: '#fff',
